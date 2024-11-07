@@ -6,7 +6,7 @@
 #    By: lrafael <lrafael@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/02 07:00:25 by lrafael           #+#    #+#              #
-#    Updated: 2024/10/02 07:28:28 by lrafael          ###   ########.fr        #
+#    Updated: 2024/11/06 11:43:08 by lrafael          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,7 +14,7 @@ NAME = philo
 CC = cc
 CFLAGS = -Wall -Werror -Wextra
 
-SRCS = ph_main.c
+SRCS = ph_main.c ph_utils.c ph_init.c ph_free.c
 OBJS = $(SRCS:.c=.o)
 
 all: $(NAME)
