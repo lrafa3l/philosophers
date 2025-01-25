@@ -6,7 +6,7 @@
 /*   By: lrafael <lrafael@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 11:11:01 by lrafael           #+#    #+#             */
-/*   Updated: 2025/01/24 13:37:20 by lrafael          ###   ########.fr       */
+/*   Updated: 2025/01/25 08:29:32 by lrafael          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,8 +44,8 @@ int	ft_init(int argc, char *argv[])
 		data = update_data(argc, argv, data);
 		t_list *temp = data;
 		do {
-			printf("Philo %ld:\ntime_to_die=%ld, time_to_eat=%ld, time_to_sleep=%ld, times_each_philo_must_eat=%ld\n",
-				   temp->philo + 1, temp->time_to_die, temp->time_to_eat, temp->time_to_sleep, temp->times_each_philo_must_eat);
+			printf("Philo %d:\ntime_to_die=%ld, time_to_eat=%ld, time_to_sleep=%ld, times_each_philo_must_eat=%ld\n",
+				   temp->id, temp->time_to_die, temp->time_to_eat, temp->time_to_sleep, temp->times_each_philo_must_eat);
 			temp = temp->next;
 		} while (temp != data);
 		pthreads_create(data);
@@ -85,8 +85,6 @@ t_list	*init_data(int argc, char *argv[], t_list *data)
 	data->eating = 0;
 	data->stopp = 0;
 	data->philo = 0;
-	data->prev = data;
-	data->next = data;
 	init_one_mutexes(data);
 	return (data);
 }

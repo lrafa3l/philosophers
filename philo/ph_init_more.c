@@ -6,7 +6,7 @@
 /*   By: lrafael <lrafael@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 12:00:24 by lrafael           #+#    #+#             */
-/*   Updated: 2025/01/24 13:14:13 by lrafael          ###   ########.fr       */
+/*   Updated: 2025/01/25 08:26:56 by lrafael          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,7 @@ void	pthreads_create(t_list *data)
 	t_list	*aux;
 
 	pthread_create(&data->philo, NULL, philos, (void *)data);
+	aux = data->next;
 	while (aux != data)
 	{
 		pthread_create(&aux->philo, NULL, philos, (void *)aux);
