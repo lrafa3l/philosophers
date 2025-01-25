@@ -6,24 +6,24 @@
 #    By: lrafael <lrafael@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/02 07:00:25 by lrafael           #+#    #+#              #
-#    Updated: 2024/11/06 11:43:08 by lrafael          ###   ########.fr        #
+#    Updated: 2025/01/24 12:47:42 by lrafael          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = philo
 CC = cc
-CFLAGS = -Wall -Werror -Wextra
+FLAGS = -Wall -Werror -Wextra -pthread
 
-SRCS = ph_main.c ph_utils.c ph_init.c ph_free.c
+SRCS = ph_main.c ph_utils.c ph_init.c ph_list.c ph_routine.c ph_routine_utils.c ph_init_more.c 
 OBJS = $(SRCS:.c=.o)
 
 all: $(NAME)
 
 %.o : %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(FLAGS) -c $< -o $@
 
 $(NAME): $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
+	$(CC) $(FLAGS) $(OBJS) -o $(NAME)
 
 clean:
 	rm -f $(OBJS)

@@ -5,65 +5,88 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: lrafael <lrafael@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/06 11:18:47 by lrafael           #+#    #+#             */
-/*   Updated: 2024/11/06 11:41:24 by lrafael          ###   ########.fr       */
+/*   Created: 2025/01/23 11:11:01 by lrafael           #+#    #+#             */
+/*   Updated: 2025/01/24 13:37:20 by lrafael          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int init_data(t_data *data, int argc, char *argv[])
+static void	pthread_m_destroy(t_list *data)
 {
-	int	i;
+	pthread_mutex_destroy(&data->fork);
+	pthread_mutex_destroy(&data->stop);
+	pthread_mutex_destroy(&data->death);
+	pthread_mutex_destroy(&data->satisfied);
+	pthread_mutex_destroy(&data->print);
+}
 
-	data->philo_nbr = ft_atoi(argv[1]);
-	data->time_to_die = ft_atoi(argv[2]);
-	data->time_to_eat = ft_atoi(argv[3]);
-	data->time_to_sleep = ft_atoi(argv[4]);
-	data->number_of_times_each_philosopher_must_eat = -1;
-	if (argc == 6)
-		data->number_of_times_each_philosopher_must_eat = ft_atoi(argv[5]);
-	if (data->philo_nbr < 2 || data->time_to_die < 0 || data->time_to_eat < 0
-		|| data->time_to_sleep < 0 || data->number_of_times_each_philosopher_must_eat == 0)
-		return (1);
-	data->forks = malloc(sizeof(int) * data->philo_nbr);
-	if (!data->forks)
-		return (1);
-    data->stop_simulation = 0;
-	data->philos = malloc(sizeof(t_philo) * data->philo_nbr);
-	if (!data->philos)
+int	ft_init(int argc, char *argv[])
+{
+	t_list	*data;
+
+	data = NULL;
+	if (ft_atoi(argv[1]) == 1)
 	{
-		free(data->forks);
-		return (1);
-	}
-	data->fork_mutex = malloc(sizeof(pthread_mutex_t) * data->philo_nbr);
-	if (!data->fork_mutex)
-	{
-		free(data->forks);
-		free(data->philos);
-		return (1);
-	}
-	i = 0;
-	while (i < data->philo_nbr)
-	{
-		data->forks[i] = 1;
-		if (pthread_mutex_init(&data->fork_mutex[i], NULL))
-		{
-			free(data->forks);
-			free(data->philos);
-			free(data->fork_mutex);
+		data = insert(data, 1, NULL);
+		data = init_data(argc, argv, data);
+		if (!data)
 			return (1);
-		}
-		i++;
-	}
-	if (pthread_mutex_init(&data->print_mutex, NULL))
+		pthread_create(&data->philo, NULL, philo, (void *)data);
+		pthread_join(data->philo, NULL);
+		pthread_m_destroy(data);
+	} 
+	else
 	{
-		free(data->forks);
-		free(data->philos);
-		free(data->fork_mutex);
-		return (1);
+		data = init(argc, argv, data);
+		if (!data)
+			return (1);
+		data = update_data(argc, argv, data);
+		t_list *temp = data;
+		do {
+			printf("Philo %ld:\ntime_to_die=%ld, time_to_eat=%ld, time_to_sleep=%ld, times_each_philo_must_eat=%ld\n",
+				   temp->philo + 1, temp->time_to_die, temp->time_to_eat, temp->time_to_sleep, temp->times_each_philo_must_eat);
+			temp = temp->next;
+		} while (temp != data);
+		pthreads_create(data);
+		pthreads_join(data);
+		pthreads_m_destroy(data);
 	}
-	gettimeofday(&data->start_time, NULL);
+	data = delete (data);
 	return (0);
 }
 
+static void	init_one_mutexes(t_list *data)
+{
+	pthread_mutex_init(&data->fork, NULL);
+	pthread_mutex_init(&data->stop, NULL);
+	pthread_mutex_init(&data->death, NULL);
+	pthread_mutex_init(&data->satisfied, NULL);
+	pthread_mutex_init(&data->print, NULL);
+}
+
+t_list	*init_data(int argc, char *argv[], t_list *data)
+{
+	if (!check_args(argc, argv))
+	{
+		printf("./philo n_philos time_to_die time_to_eat ");
+		printf("time_to_sleep times_each_philosopher_must_eat\n");
+		return (NULL);
+	}
+	data->time_to_die = ft_atoi(argv[2]) * 1000;
+	data->time_to_eat = ft_atoi(argv[3]) * 1000;
+	data->time_to_sleep = ft_atoi(argv[4]) * 1000;
+	data->times_each_philo_must_eat = -1;
+	if (argc == 6)
+		data->times_each_philo_must_eat = ft_atoi(argv[5]);
+	data->last_meal = current_time();
+	data->start_time = current_time();
+	data->died = 0;
+	data->eating = 0;
+	data->stopp = 0;
+	data->philo = 0;
+	data->prev = data;
+	data->next = data;
+	init_one_mutexes(data);
+	return (data);
+}
