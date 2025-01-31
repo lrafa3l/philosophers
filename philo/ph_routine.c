@@ -6,7 +6,7 @@
 /*   By: lrafael <lrafael@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 11:44:28 by lrafael           #+#    #+#             */
-/*   Updated: 2025/01/25 11:20:49 by lrafael          ###   ########.fr       */
+/*   Updated: 2025/01/31 12:51:51 by lrafael          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ void	*philo(void *arg)
 	data = (t_list *)arg;
 	data = print_s(data, "think");
 	data = print_s(data, "take fork");
-	usleep(data->time_to_die);
+	usleep(data->time_to_die * 1000);
 	data = print_s(data, "died");
 	return (NULL);
 }
@@ -31,17 +31,17 @@ t_list	*lock_mutexes(t_list *data)
 		usleep(100);
 	if (data->id % 2 == 0)
 	{
-		data = print_s(data, "take fork");
 		pthread_mutex_lock(&data->fork);
 		data = print_s(data, "take fork");
 		pthread_mutex_lock(&data->next->fork);
+		data = print_s(data, "take fork");
 	}
 	else
 	{
-		data = print_s(data, "take fork");
 		pthread_mutex_lock(&data->next->fork);
 		data = print_s(data, "take fork");
 		pthread_mutex_lock(&data->fork);
+		data = print_s(data, "take fork");
 	}
 	return (data);
 }
@@ -60,7 +60,8 @@ void	ft_sleep(t_list *data, long int sleep_time)
 	start_time = current_time();
 	while (time_from_start(start_time) < sleep_time / 1000 && !ft_stop(data))
 	{
-		if (time_from_start(data->last_meal) > data->time_to_die && data->eating)
+		if (time_from_start(data->start_time)
+			- data->last_meal >= data->time_to_die && data->eating)
 		{
 			pthread_mutex_lock(&first->death);
 			data->died = 1;
@@ -81,7 +82,7 @@ t_list	*ft_eat(t_list *data)
 	first = first_philo(data);
 	print_s(data, "eat");
 	data->eating = 1;
-	ft_sleep(data, data->time_to_eat);
+	ft_sleep(data, data->time_to_eat * 1000);
 	data->eating = 0;
 	if (!ft_stop(data))
 	{
@@ -106,7 +107,6 @@ void	*philos(void *arg)
 	data->start_time = current_time();
 	while (!ft_stop(data))
 	{
-		data = lock_mutexes(data);
 		if (time_from_start(data->start_time)
 			- data->last_meal > data->time_to_die)
 		{
@@ -116,14 +116,19 @@ void	*philos(void *arg)
 			data = print_s(data, "died");
 			break ;
 		}
+		data = lock_mutexes(data);
 		data = ft_eat(data);
 		pthread_mutex_unlock(&data->next->fork);
 		pthread_mutex_unlock(&data->fork);
-		if (!ft_stop(data))
+		if (data->times_each_philo_must_eat == 0)
 		{
-			data = print_s(data, "sleep");
-			ft_sleep(data, data->time_to_sleep);
+			pthread_mutex_lock(&data->stop);
+			data->stopp = 1;
+			pthread_mutex_unlock(&data->stop);
+			break ;
 		}
+		data = print_s(data, "sleep");
+		ft_sleep(data, data->time_to_sleep * 1000);
 	}
 	return (NULL);
 }

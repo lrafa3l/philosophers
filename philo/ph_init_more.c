@@ -6,7 +6,7 @@
 /*   By: lrafael <lrafael@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 12:00:24 by lrafael           #+#    #+#             */
-/*   Updated: 2025/01/25 08:26:56 by lrafael          ###   ########.fr       */
+/*   Updated: 2025/01/31 12:40:43 by lrafael          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,10 +30,7 @@ t_list	*init(int argc, char *argv[], t_list *data)
 	{
 		data = insert(data, i, NULL);
 		if (!data)
-		{
-			printf("Error: malloc\n");
 			return (NULL);
-		}
 	}
 	return (data);
 }
@@ -50,6 +47,7 @@ t_list	*update_data(int argc, char *argv[], t_list *data)
 	{
 		aux = init_data(argc, argv, aux);
 		aux = aux->next;
+		
 	}
 	return (data);
 }

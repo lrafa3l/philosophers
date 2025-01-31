@@ -6,7 +6,7 @@
 /*   By: lrafael <lrafael@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 11:11:01 by lrafael           #+#    #+#             */
-/*   Updated: 2025/01/25 08:29:32 by lrafael          ###   ########.fr       */
+/*   Updated: 2025/01/31 12:40:57 by lrafael          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,9 +73,9 @@ t_list	*init_data(int argc, char *argv[], t_list *data)
 		printf("time_to_sleep times_each_philosopher_must_eat\n");
 		return (NULL);
 	}
-	data->time_to_die = ft_atoi(argv[2]) * 1000;
-	data->time_to_eat = ft_atoi(argv[3]) * 1000;
-	data->time_to_sleep = ft_atoi(argv[4]) * 1000;
+	data->time_to_die = ft_atoi(argv[2]);
+	data->time_to_eat = ft_atoi(argv[3]);
+	data->time_to_sleep = ft_atoi(argv[4]);
 	data->times_each_philo_must_eat = -1;
 	if (argc == 6)
 		data->times_each_philo_must_eat = ft_atoi(argv[5]);
