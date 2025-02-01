@@ -6,7 +6,7 @@
 /*   By: lrafael <lrafael@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 11:11:01 by lrafael           #+#    #+#             */
-/*   Updated: 2025/01/31 12:40:57 by lrafael          ###   ########.fr       */
+/*   Updated: 2025/01/31 14:14:47 by lrafael          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,19 +35,13 @@ int	ft_init(int argc, char *argv[])
 		pthread_create(&data->philo, NULL, philo, (void *)data);
 		pthread_join(data->philo, NULL);
 		pthread_m_destroy(data);
-	} 
+	}
 	else
 	{
 		data = init(argc, argv, data);
 		if (!data)
 			return (1);
 		data = update_data(argc, argv, data);
-		t_list *temp = data;
-		do {
-			printf("Philo %d:\ntime_to_die=%ld, time_to_eat=%ld, time_to_sleep=%ld, times_each_philo_must_eat=%ld\n",
-				   temp->id, temp->time_to_die, temp->time_to_eat, temp->time_to_sleep, temp->times_each_philo_must_eat);
-			temp = temp->next;
-		} while (temp != data);
 		pthreads_create(data);
 		pthreads_join(data);
 		pthreads_m_destroy(data);
@@ -56,7 +50,7 @@ int	ft_init(int argc, char *argv[])
 	return (0);
 }
 
-static void	init_one_mutexes(t_list *data)
+static void	init_mutexes(t_list *data)
 {
 	pthread_mutex_init(&data->fork, NULL);
 	pthread_mutex_init(&data->stop, NULL);
@@ -85,6 +79,6 @@ t_list	*init_data(int argc, char *argv[], t_list *data)
 	data->eating = 0;
 	data->stopp = 0;
 	data->philo = 0;
-	init_one_mutexes(data);
+	init_mutexes(data);
 	return (data);
 }

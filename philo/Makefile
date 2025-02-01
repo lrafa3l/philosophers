@@ -6,7 +6,7 @@
 #    By: lrafael <lrafael@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/02 07:00:25 by lrafael           #+#    #+#              #
-#    Updated: 2025/01/24 12:47:42 by lrafael          ###   ########.fr        #
+#    Updated: 2025/02/01 14:25:52 by lrafael          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,6 +16,9 @@ FLAGS = -Wall -Werror -Wextra -pthread
 
 SRCS = ph_main.c ph_utils.c ph_init.c ph_list.c ph_routine.c ph_routine_utils.c ph_init_more.c 
 OBJS = $(SRCS:.c=.o)
+
+## --tool=helgrind
+## --tool=drd
 
 all: $(NAME)
 

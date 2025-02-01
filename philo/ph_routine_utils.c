@@ -6,7 +6,7 @@
 /*   By: lrafael <lrafael@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 11:56:10 by lrafael           #+#    #+#             */
-/*   Updated: 2025/01/31 11:21:26 by lrafael          ###   ########.fr       */
+/*   Updated: 2025/02/01 14:10:27 by lrafael          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,12 +72,7 @@ int	ft_stop(t_list *data)
 
 	first = first_philo(data);
 	pthread_mutex_lock(&first->stop);
-	if (ft_satisfied(data, NULL, NULL) == 1)
-	{
-		pthread_mutex_unlock(&first->stop);
-		return (1);
-	}
-	if (ft_death(data) == 1)
+	if (ft_satisfied(data, NULL, NULL) == 1 || ft_death(data) == 1)
 	{
 		pthread_mutex_unlock(&first->stop);
 		return (1);
