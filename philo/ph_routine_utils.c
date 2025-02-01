@@ -6,7 +6,7 @@
 /*   By: lrafael <lrafael@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 11:56:10 by lrafael           #+#    #+#             */
-/*   Updated: 2025/02/01 14:10:27 by lrafael          ###   ########.fr       */
+/*   Updated: 2025/02/01 19:49:51 by lrafael          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,46 +40,84 @@ int	ft_satisfied(t_list *data, t_list *aux, t_list *first)
 	return (1);
 }
 
-int	ft_death(t_list *data)
+int ft_death(t_list *data)
 {
-	t_list	*first;
-	t_list	*aux;
+    t_list *first = first_philo(data);
+    int death = 0;
 
-	first = first_philo(data);
-	pthread_mutex_lock(&first->death);
-	if (data->died != 0)
-	{
-		pthread_mutex_unlock(&first->death);
-		return (1);
-	}
-	aux = data->next;
-	while (aux != data)
-	{
-		if (aux->died != 0)
-		{
-			pthread_mutex_unlock(&first->death);
-			return (1);
-		}
-		aux = aux->next;
-	}
-	pthread_mutex_unlock(&first->death);
-	return (0);
+    pthread_mutex_lock(&first->death);
+    if (data->died != 0)
+        death = 1;
+    else
+    {
+        t_list *aux = data->next;
+        while (aux != data)
+        {
+            if (aux->died != 0)
+            {
+                death = 1;
+                break;
+            }
+            aux = aux->next;
+        }
+    }
+    pthread_mutex_unlock(&first->death);
+
+    return death;
 }
 
-int	ft_stop(t_list *data)
-{
-	t_list	*first;
+// int	ft_death(t_list *data)
+// {
+// 	t_list	*first;
+// 	t_list	*aux;
 
-	first = first_philo(data);
-	pthread_mutex_lock(&first->stop);
-	if (ft_satisfied(data, NULL, NULL) == 1 || ft_death(data) == 1)
-	{
-		pthread_mutex_unlock(&first->stop);
-		return (1);
-	}
-	pthread_mutex_unlock(&first->stop);
-	return (0);
+// 	first = first_philo(data);
+// 	pthread_mutex_lock(&first->death);
+// 	if (data->died != 0)
+// 	{
+// 		pthread_mutex_unlock(&first->death);
+// 		return (1);
+// 	}
+// 	aux = data->next;
+// 	while (aux != data)
+// 	{
+// 		if (aux->died != 0)
+// 		{
+// 			pthread_mutex_unlock(&first->death);
+// 			return (1);
+// 		}
+// 		aux = aux->next;
+// 	}
+// 	pthread_mutex_unlock(&first->death);
+// 	return (0);
+// }
+
+int ft_stop(t_list *data)
+{
+    t_list *first = first_philo(data);
+    int stop = 0;
+
+    pthread_mutex_lock(&first->stop);
+    if (ft_satisfied(data, NULL, NULL) == 1 || ft_death(data) == 1)
+        stop = 1;
+    pthread_mutex_unlock(&first->stop);
+    return stop;
 }
+
+// int	ft_stop(t_list *data)
+// {
+// 	t_list	*first;
+
+// 	first = first_philo(data);
+// 	pthread_mutex_lock(&first->stop);
+// 	if (ft_satisfied(data, NULL, NULL) == 1 || ft_death(data) == 1)
+// 	{
+// 		pthread_mutex_unlock(&first->stop);
+// 		return (1);
+// 	}
+// 	pthread_mutex_unlock(&first->stop);
+// 	return (0);
+// }
 
 void	print_msg(t_list *data, char *str)
 {
@@ -100,31 +138,54 @@ void	print_msg(t_list *data, char *str)
 			- data->start_time, data->id);
 }
 
-t_list	*print_s(t_list *data, char *str)
+t_list *print_s(t_list *data, char *str)
 {
-	t_list	*first;
+    t_list *first = first_philo(data);
 
-	first = first_philo(data);
-	pthread_mutex_lock(&first->print);
-	if (ft_stop(data) == 1)
-	{
-		if (first->stopp == 1)
-		{
-			pthread_mutex_unlock(&first->print);
-			return (data);
-		}
-		if (first->died == 1)
-		{
-			pthread_mutex_unlock(&first->print);
-			return (data);
-		}
-		print_msg(data, str);
-		first->stopp = 1;
-		first->died = 1;
-		pthread_mutex_unlock(&first->print);
-		return (data);
-	}
-	print_msg(data, str);
-	pthread_mutex_unlock(&first->print);
-	return (data);
+    // Lock the print mutex to ensure thread-safe printing
+    pthread_mutex_lock(&first->print);
+
+    // Check if the simulation should stop
+    if (ft_stop(data) == 1)
+    {
+        pthread_mutex_unlock(&first->print);
+        return data;
+    }
+
+    // Print the message
+    print_msg(data, str);
+
+    // Unlock the print mutex
+    pthread_mutex_unlock(&first->print);
+
+    return data;
 }
+
+// t_list	*print_s(t_list *data, char *str)
+// {
+// 	t_list	*first;
+
+// 	first = first_philo(data);
+// 	pthread_mutex_lock(&first->print);
+// 	if (ft_stop(data) == 1)
+// 	{
+// 		if (first->stopp == 1)
+// 		{
+// 			pthread_mutex_unlock(&first->print);
+// 			return (data);
+// 		}
+// 		if (first->died == 1)
+// 		{
+// 			pthread_mutex_unlock(&first->print);
+// 			return (data);
+// 		}
+// 		print_msg(data, str);
+// 		first->stopp = 1;
+// 		first->died = 1;
+// 		pthread_mutex_unlock(&first->print);
+// 		return (data);
+// 	}
+// 	print_msg(data, str);
+// 	pthread_mutex_unlock(&first->print);
+// 	return (data);
+// }

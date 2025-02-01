@@ -6,7 +6,7 @@
 /*   By: lrafael <lrafael@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 11:44:28 by lrafael           #+#    #+#             */
-/*   Updated: 2025/02/01 12:27:17 by lrafael          ###   ########.fr       */
+/*   Updated: 2025/02/01 19:20:22 by lrafael          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,26 +24,29 @@ void	*philo(void *arg)
 	return (NULL);
 }
 
-t_list	*lock_mutexes(t_list *data)
+t_list *lock_mutexes(t_list *data)
 {
+    t_list *first_fork, *second_fork;
+
 	data = print_s(data, "think");
 	if (data->id % 2 != 0)
 		usleep(100);
 	if (data->id % 2 == 0)
 	{
-		pthread_mutex_lock(&data->fork);
-		data = print_s(data, "take fork");
-		pthread_mutex_lock(&data->next->fork);
-		data = print_s(data, "take fork");
-	}
-	else
-	{
-		pthread_mutex_lock(&data->next->fork);
-		data = print_s(data, "take fork");
-		pthread_mutex_lock(&data->fork);
-		data = print_s(data, "take fork");
-	}
-	return (data);
+        first_fork = data;
+        second_fork = data->next;
+    }
+    else
+    {
+        first_fork = data->next;
+        second_fork = data;
+    }
+
+    pthread_mutex_lock(&first_fork->fork);
+    data = print_s(data, "take fork");
+    pthread_mutex_lock(&second_fork->fork);
+    data = print_s(data, "take fork");
+    return data;
 }
 
 long int	time_from_start(long int start_time)
@@ -66,12 +69,12 @@ void	ft_sleep(t_list *data, long int sleep_time)
 			pthread_mutex_lock(&first->death);
 			data->died = 1;
 			pthread_mutex_unlock(&first->death);
-			data = print_s(data, "died");
+           	data = print_s(data, "died");
 			return ;
 		}
 		if (ft_stop(data))
 			return ;
-		usleep(100);
+		usleep(500);
 	}
 }
 
@@ -113,7 +116,7 @@ void	*philos(void *arg)
 			pthread_mutex_lock(&first->death);
 			data->died = 1;
 			pthread_mutex_unlock(&first->death);
-			data = print_s(data, "died");
+           	data = print_s(data, "died");
 			break ;
 		}
 		data = lock_mutexes(data);
